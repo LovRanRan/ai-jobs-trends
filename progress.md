@@ -2,6 +2,11 @@
 
 > 与 `ai-jobs-trends-project-brief.md` 配套。brief 是**做什么/为什么**,progress 是**做到哪了**。
 >
+> **协作分工(Day 2 - M9)**
+> - `src/` 下的核心代码 → **本人手写**(简历项目,需要真的写过)
+> - Claude 做:架构讲解、code review、调 bug、scaffold/config/CI/docs/prompt 内容
+> - 规则边界见 Decision Log D-003
+>
 > **更新纪律**
 > - Daily Log:每个开发日结束前写一条
 > - Weekly Retro:每周日晚写一次
@@ -318,6 +323,19 @@ _(暂无,Week 1 周日 Apr 26 填写第一条)_
 - **决定**:C
 - **理由**:taxonomy 规模 < 500,内积算一次 < 1ms;复杂度应匹配数据规模
 - **回滚信号**:taxonomy > 5000 词 或 归一化成为管道延迟瓶颈
+
+---
+
+#### D-003 · 2026-04-16 · Day 2 起核心代码本人手写,Claude 辅助
+- **上下文**:这是简历项目,必须是"我写的"才算数。Day 1 scaffold 由 Claude 写是例外(boilerplate 不体现技能)
+- **选项**:
+  - A. 全由 Claude 写,我 review → 最快但简历含金量掉
+  - B. 我写核心,Claude 讲思路 + review + debug → 慢一点但真的"我做过"
+  - C. 全我写不问 Claude → 最慢,卡点时没帮手
+- **决定**:B
+- **理由**:resume signal 需要"hands-on implementation",但保留 Claude 做架构讨论和 review,避免卡死
+- **边界**:Claude 仍然写 → config yaml / CI / progress / brief / bootstrap / LLM prompts 文案 / 讲解用的 2-3 行 snippet;Claude 不写 → `src/sources/` `src/extraction/` `src/normalization/` `src/reporter/` `src/agents/` `src/mcp_server.py` `apps/web/` 完整文件
+- **回滚信号**:某个模块耗时严重超预期(> 2x)且架构讨论已经反复跑过 → 可以要求 Claude 出 draft 让我改
 
 ---
 
