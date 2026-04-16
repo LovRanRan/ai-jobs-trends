@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# uv
+.uv/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Data — 本地 sqlite 保留 full_description,不入公开 repo(见 brief §8 Risk,ADR #7)
+data/jobs.sqlite
+data/jobs.sqlite-journal
+data/jobs.sqlite-wal
+data/jobs.sqlite-shm
+data/*.local.sqlite
+data/taxonomy_embeddings.npy
+
+# Notes — 个人笔记 / review 记录不公开
+notes/
+
+# Next.js (future)
+apps/web/node_modules/
+apps/web/.next/
+apps/web/out/
+apps/web/.env*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

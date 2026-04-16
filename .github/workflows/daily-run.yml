@@ -1,0 +1,66 @@
+name: Daily Run
+
+# 每天 UTC 20:00 = PDT 13:00 / PST 12:00(见 brief §5 Week 1 周一)
+on:
+  schedule:
+    - cron: "0 20 * * *"
+  workflow_dispatch: # 允许手动触发
+
+permissions:
+  contents: write # 需要 push commit(daily digest)
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install deps
+        run: uv sync --frozen
+
+      - name: Init DB (idempotent)
+        run: uv run python -m src.storage.init_db
+
+      # ========== Week 1 周一:仅空架子,以下步骤陆续启用 ==========
+      # - name: Ingest (Greenhouse/Lever/Ashby)
+      #   env:
+      #     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      #   run: uv run python -m src.main ingest
+      #
+      # - name: Extract skills
+      #   env:
+      #     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      #   run: uv run python -m src.main extract
+      #
+      # - name: Normalize
+      #   env:
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #   run: uv run python -m src.main normalize
+      #
+      # - name: Generate daily report
+      #   run: uv run python -m src.reporter.daily
+      # ============================================================
+
+      - name: Smoke check
+        run: |
+          echo "✅ Daily run skeleton OK · $(date -u)"
+          uv run ai-jobs version
+
+      # Week 1 周二开始真正 commit 数据回 repo
+      # - name: Commit digest + db snapshot
+      #   run: |
+      #     git config user.name "github-actions[bot]"
+      #     git config user.email "github-actions[bot]@users.noreply.github.com"
+      #     git add digests/ data/taxonomy_embeddings.npy 2>/dev/null || true
+      #     git diff --cached --quiet || git commit -m "daily: $(date -u +%Y-%m-%d)"
+      #     git push
