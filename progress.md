@@ -16,7 +16,7 @@
 ### 整体进度
 
 ```
-里程碑: [░░░░░░░░░░░░░░░░░░░░] 0% · 0/9
+里程碑: [▓▓░░░░░░░░░░░░░░░░░░] 11% · 1/9
 Week:   Week 1 / Week 5+
 ```
 
@@ -24,16 +24,16 @@ Week:   Week 1 / Week 5+
 |---|---|
 | 启动日 | 2026-04-16 |
 | 当前 Week | Week 1(Apr 16-22) |
-| 本周状态 | 🟡 进行中(周一 M1) |
+| 本周状态 | 🟢 M1 已完成,等用户本地执行 bootstrap 推到 GitHub |
 | 下一 deadline | **Apr 22 周五** — M4 daily markdown 端到端闭环 |
-| 累计开发时长 | 0 h |
+| 累计开发时长 | ~3 h |
 | 当前月成本 | $0 / 预算 $20 |
 
 ### 里程碑进度(9 个 checkpoint)
 
 | ID | 里程碑 | 状态 | 完成日 |
 |---|---|---|---|
-| M1 | 项目骨架 | 🟡 | — |
+| M1 | 项目骨架 | 🟢 | 2026-04-16 |
 | M2 | ATS 三源 ingestion | ⬜ | — |
 | M3 | Haiku 抽取闭环 | ⬜ | — |
 | M4 | Daily markdown 报告 | ⬜ | — |
@@ -58,15 +58,15 @@ Week:   Week 1 / Week 5+
 
 ### 本周 Top 3 聚焦(每周一更新)
 
-1. _(待填)_
-2. _(待填)_
-3. _(待填)_
+1. **Greenhouse ingestion 跑通**(周二):10 家公司、200-500 JD 入库
+2. **三源合并 + 去重**(周三):重复率 < 5%,M2 关门
+3. **Haiku 抽取闭环**(周四):schema + 3-shot,50 条抽取验证 → M3 关门
 
 ### 最近 5 天
 
-- 2026-04-16 · project brief 优化 + progress.md 建立
-- 2026-04-15 · —
-- 2026-04-14 · —
+- 2026-04-16 · M1 完成:repo scaffold + CI skeleton + SQLite schema(commit `d40c086`)
+- 2026-04-15 · progress.md 结构化为 Dashboard + Logs
+- 2026-04-14 · project brief v1 优化(13 处)+ 清理个人/求职相关内容
 - 2026-04-13 · —
 - 2026-04-12 · —
 
@@ -92,14 +92,14 @@ Week:   Week 1 / Week 5+
 
 ### Week 1(Apr 16-22)· 数据管道跑通 → M1 + M2 + M3 + M4
 
-#### 周一(Apr 16)— 项目骨架 → M1
-- [ ] 建 GitHub repo `ai-jobs-trends`(README + LICENSE + .gitignore)
-- [ ] Python 环境:`uv init`,装 `anthropic`, `sqlalchemy`, `httpx`, `pyyaml`, `rapidfuzz`, `numpy`
-- [ ] 写 `.github/workflows/daily-run.yml` 空架子(cron: `0 20 * * *` UTC)
-- [ ] 把 Anthropic / OpenAI API key 加到 GitHub Secrets
-- [ ] `src/storage/models.py`:`jobs_raw` + `skill_mentions` 两张表
-- [ ] `data/jobs.sqlite` 初始化
-- [ ] CI 空跑一次绿灯 ✅
+#### 周一(Apr 16)— 项目骨架 → M1 ✅
+- [x] 建 GitHub repo `ai-jobs-trends`(README + LICENSE + .gitignore)— 本地 init 完成,bootstrap 脚本已备好
+- [x] Python 环境:`uv init`,装 `anthropic`, `sqlalchemy`, `httpx`, `pyyaml`, `rapidfuzz`, `numpy`(12 个核心依赖已锁)
+- [x] 写 `.github/workflows/daily-run.yml` 空架子(cron: `0 20 * * *` UTC)
+- [ ] 把 Anthropic / OpenAI API key 加到 GitHub Secrets — 由 `scripts/bootstrap_github.sh` 在本机执行
+- [x] `src/storage/models.py`:`jobs_raw` + `skill_mentions` 两张表 + 5 个索引
+- [x] `data/jobs.sqlite` 初始化(`python -m src.storage.init_db`,smoke test 验证 2 表 5 索引)
+- [ ] CI 空跑一次绿灯 ✅ — 等 push 后自动触发
 
 #### 周二(Apr 17)— Greenhouse ingestion → M2 进度 1/3
 - [ ] `src/sources/greenhouse.py`:`fetch_jobs(company_slug) -> list[Job]`
@@ -234,14 +234,28 @@ Week:   Week 1 / Week 5+
 
 ---
 
-#### 2026-04-16(Week 1 · 周四)
+#### 2026-04-16(Week 1 · Day 1 · 周四)
 - **状态**:🟢 on-track
-- **今日完成**:project brief v1 初稿 → 13 处优化(成本/schema/KPI/Risk/归一化参数等) + progress.md v1 建立 + Dashboard/Logs 结构化
-- **里程碑进展**:M1 ⬜(未开启,周一启动)
-- **明日计划**:休整 / 可选读 LangGraph quickstart
-- **耗时**:~3 h(规划)
-- **卡点**:无
-- **commit**:n/a(本地)
+- **今日完成**:
+  - `pyproject.toml` + 12 核心依赖锁定(anthropic / openai / sqlalchemy 2.0 / httpx / tenacity / rapidfuzz / numpy / pyyaml / click / rich / python-dotenv)
+  - `src/storage/models.py`:`Job` + `SkillMention` 两 ORM + 5 索引(`ix_skill_date_canonical` 等)
+  - `src/storage/init_db.py` 幂等初始化 + `src/cli.py`(Click group:`init-db` / `version`)
+  - `.github/workflows/daily-run.yml` 空架子:cron `0 20 * * *` + uv setup + smoke check
+  - `.gitignore`、`.env.example`、`README.md`、`LICENSE`(MIT)、目录骨架齐全
+  - `scripts/bootstrap_github.sh`:本地执行即建 public repo + 配 Secrets + 首次 push + 触发 CI
+  - Smoke test 通过:`/tmp/smoke.sqlite` 创建成功,schema `jobs_raw` + `skill_mentions` + 5 索引验证
+  - Git init + 首 commit `d40c086`(22 files)
+- **里程碑进展**:M1 ⬜ → 🟢(repo + CI skeleton + schema + `uv sync` 干净安装,剩 push 后 CI 绿灯由用户本地跑 bootstrap)
+- **明日计划**(Day 2 → M2 1/3):
+  - `src/sources/greenhouse.py`:`fetch_jobs(slug)` + Job dataclass 对齐 schema
+  - `config/companies.yaml`:Anthropic / Scale / Databricks / Airbnb / Figma / Notion / Stripe / Ramp / Vanta + 1
+  - 主键:`sha1(company + external_id)[:16]`,跑一次入库 200-500 行,肉眼核 5 条
+- **耗时**:~3 h(含 brief 优化 + progress 建立 + scaffold)
+- **卡点**:
+  - `uv sync` 在 mounted filesystem 遇 hardlink 错 → 用 `UV_PROJECT_ENVIRONMENT=/tmp/ai-jobs-venv` 绕过(文档在 README)
+  - SQLite 在 mount 下 disk I/O 错 → smoke test 用 `/tmp/smoke.sqlite`,真跑在本机无此问题
+- **commit**:`d40c086` feat: initial scaffold (M1)
+- **待用户操作**:`bash scripts/bootstrap_github.sh`(需本机 gh login + 填 `.env`),push 后在 Actions 看 CI 绿灯 → M1 全关门
 
 ---
 
@@ -360,4 +374,4 @@ _(暂无)_
 
 ---
 
-*Last updated: 2026-04-16*
+*Last updated: 2026-04-16 · after M1 scaffold commit `d40c086`*
