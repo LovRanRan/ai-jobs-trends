@@ -24,7 +24,7 @@ Week:   Week 1 / Week 5+
 |---|---|
 | 启动日 | 2026-04-16 |
 | 当前 Week | Week 1(Apr 16-22) |
-| 本周状态 | 🟢 M1 已完成,等用户本地执行 bootstrap 推到 GitHub |
+| 本周状态 | 🟢 M1 正式关门 · Day 2 开 M2(Greenhouse ingestion)|
 | 下一 deadline | **Apr 22 周五** — M4 daily markdown 端到端闭环 |
 | 累计开发时长 | ~3 h |
 | 当前月成本 | $0 / 预算 $20 |
@@ -96,10 +96,10 @@ Week:   Week 1 / Week 5+
 - [x] 建 GitHub repo `ai-jobs-trends`(README + LICENSE + .gitignore)— 本地 init 完成,bootstrap 脚本已备好
 - [x] Python 环境:`uv init`,装 `anthropic`, `sqlalchemy`, `httpx`, `pyyaml`, `rapidfuzz`, `numpy`(12 个核心依赖已锁)
 - [x] 写 `.github/workflows/daily-run.yml` 空架子(cron: `0 20 * * *` UTC)
-- [ ] 把 Anthropic / OpenAI API key 加到 GitHub Secrets — 由 `scripts/bootstrap_github.sh` 在本机执行
+- [x] 把 Anthropic / OpenAI API key 加到 GitHub Secrets(`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` 已配)
 - [x] `src/storage/models.py`:`jobs_raw` + `skill_mentions` 两张表 + 5 个索引
 - [x] `data/jobs.sqlite` 初始化(`python -m src.storage.init_db`,smoke test 验证 2 表 5 索引)
-- [ ] CI 空跑一次绿灯 ✅ — 等 push 后自动触发
+- [x] CI 空跑一次绿灯 ✅ — Daily Run #1 · 14s · commit `80a1a93` · Success
 
 #### 周二(Apr 17)— Greenhouse ingestion → M2 进度 1/3
 - [ ] `src/sources/greenhouse.py`:`fetch_jobs(company_slug) -> list[Job]`
@@ -254,8 +254,15 @@ Week:   Week 1 / Week 5+
 - **卡点**:
   - `uv sync` 在 mounted filesystem 遇 hardlink 错 → 用 `UV_PROJECT_ENVIRONMENT=/tmp/ai-jobs-venv` 绕过(文档在 README)
   - SQLite 在 mount 下 disk I/O 错 → smoke test 用 `/tmp/smoke.sqlite`,真跑在本机无此问题
-- **commit**:`d40c086` feat: initial scaffold (M1)
-- **待用户操作**:`bash scripts/bootstrap_github.sh`(需本机 gh login + 填 `.env`),push 后在 Actions 看 CI 绿灯 → M1 全关门
+- **commit**:`d40c086` feat: initial scaffold (M1) · `80a1a93` chore: progress.md 更新
+- **踩坑**:
+  - 沙箱 fs 残留 `.git/HEAD.lock` → `find .git -name "*.lock" -delete` 修复
+  - bootstrap 默认用了 SSH remote,但 gh 是 HTTPS 登录 → `git remote set-url` 切 HTTPS + 脚本已改默认走 HTTPS
+- **远端状态**:
+  - Repo live:<https://github.com/LovRanRan/ai-jobs-trends>
+  - Secrets 已配:`ANTHROPIC_API_KEY` / `OPENAI_API_KEY`
+  - CI 首次 run(workflow_dispatch):`24539798435` · **Success · 14s**(Daily Run #1 绿灯 → M1 验收通过)
+  - Deprecation warning(非阻塞):Node.js 20 actions 将在未来强制下线,届时 `actions/checkout`、`astral-sh/setup-uv` 需升级(记入 Week 6+ 迭代软目标)
 
 ---
 

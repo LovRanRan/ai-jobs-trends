@@ -43,11 +43,31 @@ else
 fi
 
 # --- 2. 绑 remote(幂等)---
-if git remote get-url origin >/dev/null 2>&1; then
-  echo "ℹ️  Remote 'origin' already set"
+# 默认 HTTPS(gh 已登录即可,无需 SSH key)
+# 若你 gh 是 SSH 登录,可 export REMOTE_PROTOCOL=ssh
+REMOTE_PROTOCOL="${REMOTE_PROTOCOL:-https}"
+if [[ "${REMOTE_PROTOCOL}" == "ssh" ]]; then
+  REMOTE_URL="git@github.com:${REPO_OWNER}/${REPO_NAME}.git"
 else
-  echo "→ Adding remote origin..."
-  git remote add origin "git@github.com:${REPO_OWNER}/${REPO_NAME}.git"
+  REMOTE_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}.git"
+fi
+
+if git remote get-url origin >/dev/null 2>&1; then
+  CURRENT_URL="$(git remote get-url origin)"
+  if [[ "${CURRENT_URL}" != "${REMOTE_URL}" ]]; then
+    echo "→ Fixing remote URL: ${CURRENT_URL} → ${REMOTE_URL}"
+    git remote set-url origin "${REMOTE_URL}"
+  else
+    echo "ℹ️  Remote 'origin' already set correctly"
+  fi
+else
+  echo "→ Adding remote origin (${REMOTE_PROTOCOL})..."
+  git remote add origin "${REMOTE_URL}"
+fi
+
+# 确保 gh 作为 HTTPS git credential helper(只在 HTTPS 模式下设置)
+if [[ "${REMOTE_PROTOCOL}" == "https" ]]; then
+  gh auth setup-git >/dev/null 2>&1 || true
 fi
 
 # --- 3. Push 初始 commit ---
